@@ -1,2 +1,2 @@
 # HTML_project
-repository for html sitr
+repository for html site
