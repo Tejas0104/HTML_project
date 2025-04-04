@@ -1,16 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My HTML Site</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Simple Snake Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: black;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Website</h1>
-    <h1>Watch This Video</h1>
-    <video width="640" height="360" controls>
-        <source src="Dance_Steps.mp4" type="video/mp4">
-    </video>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 400;
+
+        let snake = [{ x: 10, y: 10 }];
+        let foodX, foodY;
+        let direction = 'right';
+        let gridSize = 10;
+        let score = 0;
+
+        function generateFood() {
+            foodX = Math.floor(Math.random() * (canvas.width / gridSize));
+            foodY = Math.floor(Math.random() * (canvas.height / gridSize));
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw snake
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = 'green';
+                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize, gridSize);
+            }
+
+            // Draw food
+            ctx.fillStyle = 'red';
+            ctx.fillRect(foodX * gridSize, foodY * gridSize, gridSize, gridSize);
+        }
+
+        function update() {
+            const head = { x: snake[0].x, y: snake[0].y };
+
+            switch (direction) {
+                case 'up':
+                    head.y--;
+                    break;
+                case 'down':
+                    head.y++;
+                    break;
+                case 'left':
+                    head.x--;
+                    break;
+                case 'right':
+                    head.x++;
+                    break;
+            }
+
+            snake.unshift(head);
+
+            if (head.x < 0 || head.x >= canvas.width / gridSize || head.y < 0 || head.y >= canvas.height / gridSize) {
+                alert('Game Over! Score: ' + score);
+                resetGame();
+                return;
+            }
+
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    alert('Game Over! Score: ' + score);
+                    resetGame();
+                    return;
+                }
+            }
+
+            if (head.x === foodX && head.y === foodY) {
+                score++;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+
+            draw();
+        }
+
+        function resetGame() {
+            snake = [{ x: 10, y: 10 }];
+            direction = 'right';
+            score = 0;
+            generateFood();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down') direction = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') direction = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') direction = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left') direction = 'right';
+                    break;
+            }
+        });
+
+        generateFood();
+        setInterval(update, 100);
+    </script>
 </body>
 </html>
